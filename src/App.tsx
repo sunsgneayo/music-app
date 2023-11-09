@@ -13,7 +13,7 @@ import {
 import QueueMusicIcon from '@mui/icons-material/QueueMusic'
 
 
-function App() {
+function App({ selectedSong, onMusicListShow }) {
     const audioElement = useRef(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
@@ -42,7 +42,7 @@ function App() {
 
     // 加载 .lrc 歌词文件并解析
     useEffect(() => {
-        fetch('/命运的思量.lrc')
+        fetch(selectedSong.lyric)
             .then(response => response.text())
             .then(text => {
                 const parsedLyrics = parseLrc(text);
@@ -51,8 +51,7 @@ function App() {
     }, []);
     const handleMusicText = (currentTime) =>{
             for (let i = 0; i < lyrics.length; i++) {
-                console.log(lyrics)
-                if (i === lyrics.length - 1 || currentTime < lyrics[i + 1].timestamp ) {
+                if (i === lyrics.length - 1 || (currentTime + 0.3) < lyrics[i + 1].timestamp ) {
                     setCurrentLyricIndex(i);
                     break;
                 }
@@ -89,6 +88,25 @@ function App() {
     }
 
 
+    const [listShow, setListShow] = useState(false);
+    const handleMusicListShow = () => {
+        onMusicListShow(!listShow)
+        setListShow(!listShow)
+    }
+
+    const initialRender = useRef(true);
+    // 使用 selectedSong 进行操作
+    useEffect(() => {
+        // 检查是否是初始渲染
+        if (initialRender.current) {
+            initialRender.current = false; // 标记初始渲染为 false
+        } else {
+            // 当 selectedSong 变化时，执行相应的操作，例如播放选中的歌曲
+            console.log(`选择了歌曲：${selectedSong.name} - ${selectedSong.artists}`);
+            // 在这里可以执行播放等操作
+        }
+    }, [selectedSong]);
+
     return (
         <>
             <Box sx={{width: '100%', overflow: 'hidden'}}>
@@ -116,22 +134,20 @@ function App() {
                                 width: '100%',
                             }
                         }}>
-                            <img alt='命运的思量'
-                                 src='https://spacexcode.oss-cn-hangzhou.aliyuncs.com/1697270523238-8b4b11a5-b5a3-4ac3-b6bd-1e264f526c76.png'/>
+                            <img alt={selectedSong.name}
+                                 src={selectedSong.avatar}/>
                         </div>
                         <Box sx={{position: 'absolute', top: 0, right: 0}}>
-                            <IconButton aria-label="music queue">
+                            <IconButton aria-label="music queue" onClick={handleMusicListShow}>
                                 <QueueMusicIcon fontSize="small" htmlColor='rgba(255,255,255,0.4)'/>
                             </IconButton>
                         </Box>
-                        <Box sx={{ml: 1.5, minWidth: 0 ,color:'#fff'}}>
-                            <Typography variant="caption"
-                                        fontWeight={500}> GC 大頭 </Typography>
-                            <Typography noWrap> <b>命運的思量</b> </Typography>
+                        <Box sx={{ minWidth: 0 ,color:'#fff' , width:1}}>
+                            <Typography variant="caption" fontWeight={500}> {selectedSong.artists} </Typography>
+                            <Typography noWrap> <b>{selectedSong.name}</b> </Typography>
                             <Typography noWrap letterSpacing={-0.25}>
                                 {lyrics.length > 0 ? lyrics[currentLyricIndex].text : '歌词未加载'}
                             </Typography>
-                            {/*<Typography noWrap letterSpacing={-0.25}> 心很空 天很大 云很重 我很孤单 </Typography>*/}
                         </Box>
                     </Box>
                     <Slider
@@ -183,7 +199,7 @@ function App() {
                     >
                         <audio
                             ref={audioElement}
-                            src='/命运的思量.mp3'
+                            src={selectedSong.link}
                             onTimeUpdate={() => {
                                 setCurrentTime(audioElement.current.currentTime)
                                 setEndTime(audioElement.current.duration);
