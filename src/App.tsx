@@ -76,6 +76,7 @@ function App({ selectedSong, onMusicListShow ,musicListShow  ,onNextMusic}) {
         //设置播放结束时间
         setEndTime(audioElement.current.duration);
         setIsPlaying(!isPlaying);
+        audioElement.current.volume = volume
     };
 
     // 处理播放时间进度条
