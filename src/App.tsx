@@ -13,7 +13,7 @@ import {
 import QueueMusicIcon from '@mui/icons-material/QueueMusic'
 
 
-function App({ selectedSong, onMusicListShow }) {
+function App({ selectedSong, onMusicListShow ,musicListShow  ,onNextMusic}) {
     const audioElement = useRef(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
@@ -56,6 +56,9 @@ function App({ selectedSong, onMusicListShow }) {
                     break;
                 }
             }
+            if (currentTime === audioElement.current.duration){
+                onNextMusic()
+            }
     }
 
     const parseTimestamp = (timestamp) => {
@@ -63,24 +66,30 @@ function App({ selectedSong, onMusicListShow }) {
         return minutes * 60 + seconds;
     }
 
+    // 處理播放按鈕的事件
     const handlePlayPause = () => {
         if (isPlaying) {
             audioElement.current.pause();
         } else {
             audioElement.current.play();
         }
+        //设置播放结束时间
+        setEndTime(audioElement.current.duration);
         setIsPlaying(!isPlaying);
     };
 
+    // 处理播放时间进度条
     const handleTimeChange = (event, newValue) => {
         audioElement.current.currentTime = newValue;
         setCurrentTime(newValue);
     };
+    // 处理音量变化
     const handleVolumeChange = (event, newValue) => {
         audioElement.current.volume = newValue;
         setVolume(newValue);
     };
 
+    // 时间格式化
     const formatTime = (seconds) => {
         const minutes = Math.floor(seconds / 60);
         const remainingSeconds = Math.floor(seconds % 60);
@@ -89,11 +98,14 @@ function App({ selectedSong, onMusicListShow }) {
 
 
     const [listShow, setListShow] = useState(false);
+    // 子组件控制父组件弹出层
     const handleMusicListShow = () => {
         onMusicListShow(!listShow)
         setListShow(!listShow)
     }
 
+
+    // 父组件切歌监听
     const initialRender = useRef(true);
     // 使用 selectedSong 进行操作
     useEffect(() => {
@@ -103,9 +115,21 @@ function App({ selectedSong, onMusicListShow }) {
         } else {
             // 当 selectedSong 变化时，执行相应的操作，例如播放选中的歌曲
             console.log(`选择了歌曲：${selectedSong.name} - ${selectedSong.artists}`);
+
+            console.log(selectedSong)
             // 在这里可以执行播放等操作
+            if (selectedSong.play === true){
+                audioElement.current.play()
+                setIsPlaying(true)
+            }
+
         }
     }, [selectedSong]);
+
+    // 监听父组件抽屉响应事件
+    useEffect(() => {
+        setListShow(musicListShow)
+    }, [musicListShow]);
 
     return (
         <>
@@ -138,7 +162,14 @@ function App({ selectedSong, onMusicListShow }) {
                                  src={selectedSong.avatar}/>
                         </div>
                         <Box sx={{position: 'absolute', top: 0, right: 0}}>
-                            <IconButton aria-label="music queue" onClick={handleMusicListShow}>
+                            <IconButton aria-label="music queue" onClick={handleMusicListShow} sx={{
+                                '&:hover': {
+                                    backgroundColor: 'rgba(255,255,255,0.1)', // 悬停时的颜色
+                                },
+                                '&:focus': {
+                                    outline:0
+                                },
+                            }}>
                                 <QueueMusicIcon fontSize="small" htmlColor='rgba(255,255,255,0.4)'/>
                             </IconButton>
                         </Box>
@@ -201,12 +232,12 @@ function App({ selectedSong, onMusicListShow }) {
                             ref={audioElement}
                             src={selectedSong.link}
                             onTimeUpdate={() => {
+                                // 更新已播放時間
                                 setCurrentTime(audioElement.current.currentTime)
-                                setEndTime(audioElement.current.duration);
                                 handleMusicText(audioElement.current.currentTime)
                             }}
                         />
-                        <IconButton aria-label="previous song"   sx={{
+                        <IconButton onClick={onNextMusic} aria-label="previous song"   sx={{
                             '&:hover': {
                                 backgroundColor: 'rgba(255,255,255,0.1)', // 悬停时的颜色
                             },
@@ -230,7 +261,7 @@ function App({ selectedSong, onMusicListShow }) {
                                 <PlayArrowRounded sx={{ fontSize: '3rem' }} htmlColor='#fff' />
                             )}
                         </IconButton>
-                        <IconButton aria-label="next song" sx={{
+                        <IconButton onClick={onNextMusic}  aria-label="next song" sx={{
                             '&:hover': {
                                 backgroundColor: 'rgba(255,255,255,0.1)', // 悬停时的颜色
                             },
