@@ -1,3 +1,4 @@
+// tslint:disable
 import React, { useState ,useRef, useEffect } from 'react';
 import './App.css'
 import {Box, Typography, Slider, Stack} from '@mui/material';
