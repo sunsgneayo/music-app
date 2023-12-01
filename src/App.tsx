@@ -41,8 +41,19 @@ function App({ selectedSong, onMusicListShow ,musicListShow  ,onNextMusic}) {
         return parsedLyrics;
     }
 
+    const  onLoadLyrics = (lyric) => {
+        fetch(lyric)
+            .then(response => response.text())
+            .then(text => {
+                const parsedLyrics = parseLrc(text);
+                setLyrics(parsedLyrics);
+            })
+    }
+
     // 加载 .lrc 歌词文件并解析
     useEffect(() => {
+        console.log('加载歌词')
+        console.log(selectedSong.lyric)
         fetch(selectedSong.lyric)
             .then(response => response.text())
             .then(text => {
@@ -118,7 +129,7 @@ function App({ selectedSong, onMusicListShow ,musicListShow  ,onNextMusic}) {
             // 当 selectedSong 变化时，执行相应的操作，例如播放选中的歌曲
             console.log(`选择了歌曲：${selectedSong.name} - ${selectedSong.artists}`);
 
-            console.log(selectedSong)
+            onLoadLyrics(selectedSong.lyric)
             // 在这里可以执行播放等操作
             if (selectedSong.play === true){
                 audioElement.current.play()

@@ -49,7 +49,7 @@ function Match() {
             />
 
             <Drawer
-                anchor='bottom'
+                anchor='right'
                 open={listShow}
                 onClose={() => {
                     setListShow(false)
