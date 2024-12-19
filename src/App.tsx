@@ -120,11 +120,13 @@ function App({ selectedSong, onMusicListShow ,musicListShow  ,onNextMusic}) {
 
     // 处理播放时间进度条
     const handleTimeChange = (event, newValue) => {
+        // @ts-expect-error
         audioElement.current.currentTime = newValue;
         setCurrentTime(newValue);
     };
     // 处理音量变化
     const handleVolumeChange = (event, newValue) => {
+        // @ts-ignore
         audioElement.current.volume = newValue;
         setVolume(newValue);
     };
@@ -155,10 +157,11 @@ function App({ selectedSong, onMusicListShow ,musicListShow  ,onNextMusic}) {
         } else {
             // 当 selectedSong 变化时，执行相应的操作，例如播放选中的歌曲
             console.log(`选择了歌曲：${selectedSong.name} - ${selectedSong.artists}`);
-
             onLoadLyrics(selectedSong.lyric)
             // 在这里可以执行播放等操作
             if (selectedSong.play === true){
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
                 audioElement.current.play()
                 setIsPlaying(true)
                 console.log('切换播放背景' ,selectedSong.avatar)
@@ -231,7 +234,7 @@ function App({ selectedSong, onMusicListShow ,musicListShow  ,onNextMusic}) {
                         // max={audioElement.current.duration || 0}
                         onChange={handleTimeChange}
                         min={0}
-                        max={audioElement.current?.duration}
+                        max={endTime}
                         step={1}
                         sx={{
                             color: 'rgba(255,255,255,0.87)',

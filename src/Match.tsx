@@ -29,13 +29,13 @@ function Match() {
     }
     // 随机播放下一曲
     const onNextMusic = () =>{
-        let count = songList.length - 1
-        let song = songList[getRandomNumber(0 , count)]
+        const count = songList.length - 1
+        const song = songList[getRandomNumber(0 , count)]
         handleSongClick(song)
     }
 
     // 获取随机数
-    const getRandomNumber = (min, max) => {
+    const getRandomNumber = (min: number, max: number) => {
         return Math.floor(Math.random() * (max - min + 1) + min);
     };
 
@@ -77,15 +77,9 @@ function Match() {
                                         <Avatar alt={item.artists} src={item.avatar}/>
                                     </ListItemIcon>
                                     <ListItemText secondary={
-                                        <React.Fragment>
-                                            <Typography sx={{display: 'inline', color: '#fff'}} component="span"
-                                                        variant="body1">
-                                                {item.name}
-                                            </Typography>
-                                            <Typography sx={{display: 'inline', color: '#fff', fontsize: 0.5}}>
-                                                {' -- ' + item.artists}
-                                            </Typography>
-                                        </React.Fragment>
+                                        <Typography sx={{display: 'inline', color: '#fff'}} variant="body1">
+                                            {item.name} -- {item.artists}
+                                        </Typography>
                                     }/>
                                 </ListItemButton>
                             </ListItem>
