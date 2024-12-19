@@ -25,6 +25,8 @@ function App({ selectedSong, onMusicListShow ,musicListShow  ,onNextMusic}) {
     // 解析 .lrc 歌词文本并将其转化为歌词对象
     const [lyrics, setLyrics] = useState([]);
     const [currentLyricIndex, setCurrentLyricIndex] = useState(0);
+
+    // 背景图片处理
     const parseLrc = (lrcText) => {
         const lines = lrcText.split('\n');
         const parsedLyrics = [];
@@ -52,25 +54,32 @@ function App({ selectedSong, onMusicListShow ,musicListShow  ,onNextMusic}) {
 
     // 加载 .lrc 歌词文件并解析
     useEffect(() => {
-        console.log('加载歌词')
-        console.log(selectedSong.lyric)
+        // 加载歌词
         fetch(selectedSong.lyric)
             .then(response => response.text())
             .then(text => {
                 const parsedLyrics = parseLrc(text);
                 setLyrics(parsedLyrics);
             });
+        // 读取音频时长
+        if (audioElement.current) {
+            audioElement.current.addEventListener('loadedmetadata', () => {
+                if (!isNaN(audioElement.current.duration)) {
+                    setEndTime(audioElement.current.duration);
+                }
+            });
+        }
     }, []);
     const handleMusicText = (currentTime) =>{
-            for (let i = 0; i < lyrics.length; i++) {
-                if (i === lyrics.length - 1 || (currentTime + 0.3) < lyrics[i + 1].timestamp ) {
-                    setCurrentLyricIndex(i);
-                    break;
-                }
+        for (let i = 0; i < lyrics.length; i++) {
+            if (i === lyrics.length - 1 || (currentTime + 0.3) < lyrics[i + 1].timestamp ) {
+                setCurrentLyricIndex(i);
+                break;
             }
-            if (currentTime === audioElement.current.duration){
-                onNextMusic()
-            }
+        }
+        if (currentTime === audioElement.current.duration){
+            onNextMusic()
+        }
     }
 
     const parseTimestamp = (timestamp) => {
@@ -82,13 +91,31 @@ function App({ selectedSong, onMusicListShow ,musicListShow  ,onNextMusic}) {
     const handlePlayPause = () => {
         if (isPlaying) {
             audioElement.current.pause();
+            setBodyBackground(''); // 暂停时清除背景
         } else {
             audioElement.current.play();
+            setBodyBackground(selectedSong.avatar); // 播放时设置背景
         }
         //设置播放结束时间
-        setEndTime(audioElement.current.duration);
+        if (!isNaN(audioElement.current.duration)) {
+            setEndTime(audioElement.current.duration);
+        }
         setIsPlaying(!isPlaying);
         audioElement.current.volume = volume
+    };
+
+
+    // 设置 body 背景的函数
+    const setBodyBackground = (imageUrl: string) => {
+        const body = document.body;
+        if (imageUrl) {
+            body.style.backgroundImage = `url(${imageUrl})`;
+            body.style.backgroundSize = 'cover';
+            body.style.backgroundPosition = 'center';
+            body.style.backgroundAttachment = 'fixed';
+        } else {
+            body.style.backgroundImage = 'none';
+        }
     };
 
     // 处理播放时间进度条
@@ -103,7 +130,7 @@ function App({ selectedSong, onMusicListShow ,musicListShow  ,onNextMusic}) {
     };
 
     // 时间格式化
-    const formatTime = (seconds) => {
+    const formatTime = (seconds: number) => {
         const minutes = Math.floor(seconds / 60);
         const remainingSeconds = Math.floor(seconds % 60);
         return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
@@ -134,7 +161,10 @@ function App({ selectedSong, onMusicListShow ,musicListShow  ,onNextMusic}) {
             if (selectedSong.play === true){
                 audioElement.current.play()
                 setIsPlaying(true)
+                console.log('切换播放背景' ,selectedSong.avatar)
+                setBodyBackground(selectedSong.avatar); // 播放时设置背景
             }
+
 
         }
     }, [selectedSong]);
@@ -203,30 +233,30 @@ function App({ selectedSong, onMusicListShow ,musicListShow  ,onNextMusic}) {
                         min={0}
                         max={audioElement.current?.duration}
                         step={1}
-                            sx={{
-                                color: 'rgba(255,255,255,0.87)',
-                                height: 4,
-                                '& .MuiSlider-thumb': {
-                                    width: 8,
-                                    height: 8,
-                                    transition: '0.3s cubic-bezier(.47,1.64,.41,.8)',
-                                    '&:before': {
-                                        boxShadow: '0 2px 12px 0 rgba(255,255,255,0.4)',
-                                    },
-                                    '&:hover, &.Mui-focusVisible': {
-                                        boxShadow: `0px 0px 0px 8px ${
-                                            'rgb(255 255 255 / 16%)'
-                                        }`,
-                                    },
-                                    '&.Mui-active': {
-                                        width: 20,
-                                        height: 20,
-                                    },
+                        sx={{
+                            color: 'rgba(255,255,255,0.87)',
+                            height: 4,
+                            '& .MuiSlider-thumb': {
+                                width: 8,
+                                height: 8,
+                                transition: '0.3s cubic-bezier(.47,1.64,.41,.8)',
+                                '&:before': {
+                                    boxShadow: '0 2px 12px 0 rgba(255,255,255,0.4)',
                                 },
-                                '& .MuiSlider-rail': {
-                                    opacity: 0.28,
+                                '&:hover, &.Mui-focusVisible': {
+                                    boxShadow: `0px 0px 0px 8px ${
+                                        'rgb(255 255 255 / 16%)'
+                                    }`,
                                 },
-                            }}
+                                '&.Mui-active': {
+                                    width: 20,
+                                    height: 20,
+                                },
+                            },
+                            '& .MuiSlider-rail': {
+                                opacity: 0.28,
+                            },
+                        }}
                     />
                     <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: -2}}
                     >
