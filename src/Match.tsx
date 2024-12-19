@@ -11,7 +11,7 @@ import {
     Drawer
 } from '@mui/material';
 import App from './App.tsx'
-import {songList} from "../public/songList";
+import songList from "../public/song.json";
 
 function Match() {
 
