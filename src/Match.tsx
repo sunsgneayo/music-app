@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Box,
     Typography,
@@ -12,17 +12,27 @@ import {
 } from '@mui/material';
 import App from './App.tsx';
 
+// 定义歌曲类型
+interface Song {
+    name: string;
+    artists: string;
+    avatar: string;
+    link: string;
+    lyric: string;
+    play?: boolean;
+}
+
 function Match() {
     const [listShow, setListShow] = useState(false);
-    const [selectedSong, setSelectedSong] = useState(null);
-    const [songList, setSongList] = useState(null);
+    const [selectedSong, setSelectedSong] = useState<Song | null>(null);
+    const [songList, setSongList] = useState<Song[] | null>(null);
 
-    const onMusicListShow = (state) => {
+    const onMusicListShow = (state: boolean) => {
         setListShow(state);
     };
 
     // 处理歌曲点击事件
-    const handleSongClick = (song) => {
+    const handleSongClick = (song: Song) => {
         song.play = true;
         setSelectedSong(song);
         // 在这里可以进行其他处理，比如播放选中的歌曲
@@ -37,7 +47,7 @@ function Match() {
     };
 
     // 获取随机数
-    const getRandomNumber = (min, max) => {
+    const getRandomNumber = (min: number, max: number): number => {
         return Math.floor(Math.random() * (max - min + 1) + min);
     };
 
@@ -48,7 +58,7 @@ function Match() {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            const data = await response.json();
+            const data: Song[] = await response.json();
             setSongList(data);
             setSelectedSong(data[1] || null); // 设置默认歌曲
         } catch (error) {
@@ -88,7 +98,7 @@ function Match() {
                     zIndex: 1
                 }}>
                     <List>
-                        {songList.map((item, index) => (
+                        {songList.map((item: Song, index: number) => (
                             <ListItem
                                 key={index}
                                 disablePadding
