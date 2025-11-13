@@ -416,13 +416,13 @@ function App({ selectedSong, onMusicListShow ,musicListShow  ,onNextMusic}: any)
                         <canvas 
                             ref={canvasRef}
                             width={343}
-                            height={80}
+                            height={50}
                             style={{
                                 width: '100%',
                                 maxWidth: '343px',
-                                height: '80px',
+                                height: '50px',
                                 border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '8px',
+                                borderRadius: '4px',
                                 backgroundColor: 'rgba(0,0,0,0.2)'
                             }}
                         />
