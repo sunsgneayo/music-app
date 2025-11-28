@@ -374,7 +374,7 @@ function App({ selectedSong, onMusicListShow ,musicListShow  ,onNextMusic}: any)
                     margin: 'auto',
                     position: 'relative',
                     zIndex: 1,
-                    backgroundColor: 'rgba(0,0,0,0.6)',
+                    backgroundColor: 'rgba(0,0,0,0.2)',
                     backdropFilter: 'blur(40px)'
                 }}>
                     <Box sx={{display: 'flex', alignItems: 'center', position: 'relative'}}>
